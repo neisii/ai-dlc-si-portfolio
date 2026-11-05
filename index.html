@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI-DLC 개발 체계 구축</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+/* =========================================================
+   SI 프로젝트 포트폴리오 — Portfolio v2의 Baked & Warm 톤을 웹 페이지(스크롤)로 옮김
+   ========================================================= */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+:root {
+  --bg:        #FBF5EC;
+  --surface:   #F1E4CE;
+  --surface-2: #F7ECD6;
+  --line:      #D9C3A1;
+  --line-soft: #E8DDC4;
+  --accent:    #A0522D;
+  --accent-2:  #C28350;
+  --ink:       #2A1A0F;
+  --ink-2:     #6B4A2B;
+  --ink-3:     #9A7E5C;
+  --serif: 'Fraunces', 'Pretendard', serif;
+  --sans:  'Pretendard', system-ui, -apple-system, sans-serif;
+  --mono:  'JetBrains Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+img { max-width: 100%; height: auto; }
+.tl-cards, .tl-card, .case-text, .case-visual, .cap-card, .answer, .layer, .role, .link-card { min-width: 0; overflow-wrap: anywhere; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: 0.88em; background: var(--surface-2); padding: 1px 5px; border-radius: 3px; }
+
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
+
+/* ---------- 상단 표식 ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(251,245,236,0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.topbar .wrap { display: flex; align-items: center; gap: 18px; height: 52px; }
+.topbar .mark { font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--ink-2); white-space: nowrap; }
+.topbar nav { margin-left: auto; display: flex; gap: 16px; overflow-x: auto; }
+.topbar nav a {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--ink-3); text-decoration: none; white-space: nowrap;
+}
+.topbar nav a:hover { color: var(--accent); }
+
+/* ---------- 표지 ---------- */
+.hero { padding: 72px 0 56px; text-align: center; }
+.hero .kicker {
+  font-family: var(--mono); font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
+}
+.hero h1 {
+  font-family: var(--serif); font-weight: 500; font-size: 52px; letter-spacing: -1.2px; line-height: 1.12;
+  margin: 18px auto 0; max-width: 860px;
+}
+.hero .meta {
+  font-family: var(--mono); font-size: 12px; letter-spacing: 1.5px; color: var(--ink-3); text-transform: uppercase;
+  margin-top: 18px;
+}
+.hero-divider { display: flex; align-items: center; gap: 14px; max-width: 760px; margin: 34px auto 18px; }
+.hero-divider .line { flex: 1; height: 1px; background: var(--line); }
+.hero-divider .label { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--ink-2); }
+.hero-about { max-width: 720px; margin: 0 auto; font-size: 16px; line-height: 1.8; color: var(--ink); }
+.hero-about p { margin: 0 0 12px; }
+.hero-about em { font-family: var(--serif); color: var(--accent); }
+.hero-contact {
+  display: flex; gap: 24px; justify-content: center; margin-top: 22px;
+  font-family: var(--mono); font-size: 12px; color: var(--ink-2); letter-spacing: 0.5px; flex-wrap: wrap;
+}
+.hero-contact .key { color: var(--ink-3); margin-right: 6px; }
+.hero-contact a { color: inherit; text-decoration: none; }
+
+.cover-photo { width: 120px; height: 120px; border-radius: 50%; background: var(--surface); border: 1.5px solid var(--line); display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 0 auto 18px; }
+.cover-photo img { image-rendering: pixelated; width: 72px; height: auto; }
+
+/* ---------- 섹션 공통 ---------- */
+section.block { padding: 56px 0; border-top: 1px solid var(--line-soft); }
+.slide-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+.slide-head .num { font-family: var(--serif); font-style: italic; font-size: 30px; color: var(--accent); line-height: 1; }
+.slide-head h2 { font-family: var(--serif); font-size: 32px; font-weight: 500; letter-spacing: -0.5px; margin: 0; line-height: 1.1; }
+.slide-head .sub {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; color: var(--ink-3); text-transform: uppercase; margin-left: auto;
+}
+.slide-rule { height: 1px; background: var(--line); margin: 0 0 28px; }
+.section-label {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-3);
+  margin: 0 0 14px; display: flex; align-items: center; gap: 10px;
+}
+.section-label::after { content: ""; flex: 1; height: 1px; background: var(--line-soft); }
+.lead { font-size: 15.5px; color: var(--ink); max-width: 820px; margin: 0 0 22px; }
+
+/* ---------- 성과 카드 ---------- */
+.cap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.cap-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+  padding: 18px 20px; display: flex; flex-direction: column; gap: 8px;
+}
+.cap-card.lead-card { grid-column: span 3; background: #FAEFD8; border-color: var(--accent); }
+.cap-card .num { font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--accent); }
+.cap-card .metric { font-family: var(--serif); font-size: 30px; font-weight: 500; color: var(--ink); line-height: 1.1; letter-spacing: -0.5px; }
+.cap-card .metric small { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: 0.5px; margin-left: 6px; }
+.cap-card h3 { font-family: var(--serif); font-size: 18px; font-weight: 500; margin: 0; line-height: 1.3; }
+.cap-card p { font-size: 13.5px; line-height: 1.6; color: var(--ink-2); margin: 0; }
+
+/* ---------- 원칙 ---------- */
+.quote {
+  font-family: var(--serif); font-size: 26px; font-weight: 500; letter-spacing: -0.4px; line-height: 1.35;
+  border-left: 3px solid var(--accent); padding: 4px 0 4px 20px; margin: 0 0 22px;
+}
+.answers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 8px; }
+.answer { border-top: 2px solid var(--ink-2); padding-top: 14px; }
+.answer .num { font-family: var(--serif); font-style: italic; color: var(--accent); font-size: 15px; }
+.answer h3 { font-family: var(--serif); font-size: 19px; font-weight: 500; margin: 4px 0 8px; line-height: 1.3; }
+.answer .principle { font-size: 14px; color: var(--ink); margin: 0 0 10px; }
+.answer .tools { font-size: 13px; color: var(--ink-2); margin: 0; }
+
+/* ---------- 타임라인 ---------- */
+.timeline { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 0 22px; }
+.timeline .rail { display: flex; flex-direction: column; align-items: center; padding-top: 22px; }
+.timeline .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--ink-2); border: 2px solid var(--bg); box-shadow: 0 0 0 1.5px var(--ink-2); flex-shrink: 0; }
+.timeline .dot.now { background: var(--accent); box-shadow: 0 0 0 1.5px var(--accent); }
+.timeline .line { width: 1.5px; flex: 1; background: var(--line); margin: 4px 0; min-height: 40px; }
+.tl-cards { display: flex; flex-direction: column; gap: 14px; }
+.tl-card { border: 1px solid var(--line); background: var(--surface); border-radius: 4px; padding: 16px 20px; }
+.tl-card.now { border-color: var(--accent); background: #FAEFD8; }
+.tl-card .period { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--ink-3); text-transform: uppercase; }
+.tl-card h3 { font-family: var(--serif); font-size: 19px; font-weight: 500; margin: 2px 0 6px; }
+.tl-card.now h3 { color: var(--accent); }
+.tl-card p { margin: 0; font-size: 14px; color: var(--ink); }
+figure.evidence { margin: 12px 0 0; }
+figure.evidence a { display: block; width: 50%; }
+figure.evidence img { width: 100%; border: 1px solid var(--line); border-radius: 4px; display: block; }
+figure.evidence figcaption { font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 6px; letter-spacing: 0.3px; }
+
+/* ---------- 하네스 구조 ---------- */
+.layers { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: 10px; margin-bottom: 26px; }
+.layer { border: 1px solid var(--line); background: var(--surface); border-radius: 4px; padding: 16px 18px; }
+.layer .lname { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+.layer h3 { font-family: var(--serif); font-size: 20px; font-weight: 500; margin: 4px 0 6px; }
+.layer p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.layers .arrow { display: flex; align-items: center; font-family: var(--mono); color: var(--ink-3); font-size: 18px; }
+.gate { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 26px; }
+.gate .step { font-family: var(--mono); font-size: 12px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg); color: var(--ink-2); }
+.gate .step.human { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.gate .sep { color: var(--ink-3); font-family: var(--mono); }
+.roles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.role { border: 1px dashed var(--line); border-radius: 4px; padding: 12px 14px; background: var(--bg); }
+.role .rname { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--ink); }
+.role p { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+
+/* ---------- 사례 ---------- */
+.case { padding: 30px 0; border-bottom: 1px solid var(--line-soft); }
+.case:last-of-type { border-bottom: none; }
+.case-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.badge { display: inline-flex; align-items: center; padding: 3px 9px; font-family: var(--mono); font-size: 10.5px; font-weight: 600; letter-spacing: 1.5px; white-space: nowrap; }
+.badge.ink { background: var(--ink); color: var(--bg); }
+.badge.outline { background: transparent; color: var(--accent); border: 1.2px solid var(--accent); }
+.case-title { font-family: var(--serif); font-size: 28px; font-weight: 500; letter-spacing: -0.5px; margin: 6px 0 4px; line-height: 1.2; }
+.case-tagline { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--ink-2); margin: 0 0 18px; }
+.case-body { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 28px; }
+.case-visual {
+  background: repeating-linear-gradient(135deg, var(--surface) 0 10px, var(--surface-2) 10px 20px);
+  border: 1px solid var(--line); border-radius: 4px; padding: 24px; display: flex; flex-direction: column; justify-content: center; gap: 14px;
+}
+.case-visual .vlabel { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-3); }
+.case-visual .big { font-family: var(--serif); font-size: 44px; font-weight: 500; letter-spacing: -1px; line-height: 1; color: var(--ink); }
+.case-visual .big small { font-family: var(--mono); font-size: 13px; color: var(--ink-3); letter-spacing: 0.5px; }
+.case-visual .vnote { font-size: 13px; color: var(--ink-2); }
+.case-visual ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.case-visual ol li { font-size: 13px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 3px; padding: 6px 10px; }
+.case-visual ol li b { font-family: var(--mono); color: var(--accent); margin-right: 6px; }
+.case-text { display: flex; flex-direction: column; gap: 16px; }
+.blk .blabel { font-family: var(--serif); font-style: italic; font-size: 16px; font-weight: 500; color: var(--accent); }
+.blk p { margin: 4px 0 0; font-size: 14.5px; line-height: 1.7; }
+.more { margin-top: 26px; }
+.more ul { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
+.more li { font-size: 14px; color: var(--ink-2); padding-left: 14px; position: relative; }
+.more li::before { content: ""; position: absolute; left: 0; top: 11px; width: 5px; height: 1.5px; background: var(--accent); }
+
+/* ---------- 도구 ---------- */
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+.chip { font-family: var(--mono); font-size: 11px; padding: 3px 9px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink-2); background: var(--bg); white-space: nowrap; }
+
+/* ---------- 얻은 것 / 치른 것 ---------- */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.two-col h3 { font-family: var(--serif); font-style: italic; font-size: 18px; font-weight: 500; color: var(--accent); margin: 0 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+.two-col ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.two-col li { font-size: 14px; line-height: 1.6; padding-left: 14px; position: relative; }
+.two-col li::before { content: ""; position: absolute; left: 0; top: 11px; width: 5px; height: 1.5px; background: var(--accent); }
+.two-col li .arrow { color: var(--ink-3); }
+
+/* ---------- 링크 목록 ---------- */
+.links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.link-card { border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; background: var(--surface); text-decoration: none; color: var(--ink); display: block; }
+.link-card:hover { border-color: var(--accent); }
+.link-card .t { font-family: var(--serif); font-size: 17px; font-weight: 500; }
+.link-card .d { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+.link-card .u { font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 6px; }
+
+footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font-family: var(--mono); font-size: 12px; color: var(--ink-3); text-align: center; letter-spacing: 0.5px; }
+
+/* ---------- 좁은 화면 ---------- */
+@media (max-width: 760px) {
+  .wrap { padding: 0 16px; }
+  .hero h1 { font-size: 34px; }
+  .cap-grid, .answers, .roles, .links, .two-col, .more ul { grid-template-columns: minmax(0, 1fr); }
+  .cap-card.lead-card { grid-column: auto; }
+  .case-body { grid-template-columns: minmax(0, 1fr); }
+  .hero-contact { flex-direction: column; gap: 6px; }
+  .timeline { gap: 0 12px; }
+  .layers { grid-template-columns: minmax(0, 1fr); }
+  .layers .arrow { justify-content: center; transform: rotate(90deg); }
+  .slide-head .sub { margin-left: 0; width: 100%; }
+  .topbar nav { display: none; }
+}
+@media print {
+  .topbar { display: none; }
+  :root { --bg: #FFFFFF; }
+  section.block { break-inside: avoid-page; }
+}
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <span class="mark">Portfolio · SI Project</span>
+    <nav>
+      <a href="#results">Results</a>
+      <a href="#how">Principles</a>
+      <a href="#flow">Timeline</a>
+      <a href="#harness">Harness</a>
+      <a href="#cases">Cases</a>
+      <a href="#tool">Tool</a>
+      <a href="#tradeoffs">Trade-offs</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 표지 ============ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="cover-photo"><img src="assets/goraeng.gif" alt="고래응"></div>
+    <p class="kicker">SI Project · 2026.07 — 10</p>
+    <h1>AI-DLC 개발 체계 구축</h1>
+    <p class="meta">준공공 커머스 차세대 · 계약 도메인 · 백가희</p>
+
+    <div class="hero-divider"><span class="line"></span><span class="label">Overview</span><span class="line"></span></div>
+
+    <div class="hero-about">
+      <p>백엔드 9년 · 첫 구축형 SI · 도메인 경험 없이 투입</p>
+      <p>인프라 대신 병목을 줄이던 방식을 AI 세션 운영에 적용.<br><em>담당 34화면을 일정보다 한 달 앞서 구현.</em></p>
+    </div>
+
+    <div class="hero-contact">
+      <a href="https://github.com/neisii" target="_blank"><span class="key">GitHub</span>github.com/neisii</a>
+      <span><span class="key">Email</span>neisii@outlook.com</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 01 성과 ============ -->
+<section class="block" id="results">
+  <div class="wrap">
+    <div class="slide-head"><span class="num">01</span><h2>성과</h2><span class="sub">Results</span></div>
+    <div class="slide-rule"></div>
+
+    <div class="cap-grid">
+      <div class="cap-card lead-card">
+        <span class="num">화면 구현</span>
+        <div class="metric">34화면 <small>1개월 단축</small></div>
+        <p>11월 일정분까지 10월 완료 · 조회 위주, 상태 변경 3~4개</p>
+      </div>
+      <div class="cap-card">
+        <span class="num">개발 체계</span>
+        <div class="metric">13 → 27 → 31</div>
+        <p>규칙 13 · 스킬 27 · 도구 31 · 코드 약 2.4만 줄(Claude 공동)</p>
+      </div>
+      <div class="cap-card">
+        <span class="num">세션 운영</span>
+        <div class="metric">7 <small>역할 세션</small></div>
+        <p>결정·규칙·도구 제작 권한을 각 1개 세션으로</p>
+      </div>
+      <div class="cap-card">
+        <span class="num">시나리오 검증</span>
+        <div class="metric">26 / 34</div>
+        <p>코드 대조 · 데이터셋·Stub · Playwright · 미검증분 인계</p>
+      </div>
+      <div class="cap-card">
+        <span class="num">상시 점검</span>
+        <div class="metric">10분 <small>주기</small></div>
+        <p>긴급 항목만 표시 · 약 40시간 254회</p>
+      </div>
+      <div class="cap-card">
+        <span class="num">인계 문서</span>
+        <div class="metric">52 <small>편</small></div>
+        <p>화면 30 · 정책 22 · 불일치 12건 별첨</p>
+      </div>
+      <div class="cap-card">
+        <span class="num">팀 도구</span>
+        <div class="metric">1 <small>종</small></div>
+        <p>배포 대상 추출 도구 · 팀 사용 중</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 원칙 ============ -->
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="slide-head"><span class="num">02</span><h2>원칙</h2><span class="sub">Principles</span></div>
+    <div class="slide-rule"></div>
+
+    <p class="quote">AI도 사람처럼.<br>콩 심은 데 콩 난다.</p>
+
+    <div class="answers">
+      <div class="answer">
+        <span class="num">01</span>
+        <h3>경계·책임·참조</h3>
+        <p class="principle">분명하면 덜 헤맨다.</p>
+        <p class="tools">열람 범위 제한 · 권한별 전담 세션 · 정본 단일화</p>
+      </div>
+      <div class="answer">
+        <span class="num">02</span>
+        <h3>판단 부담 최소화</h3>
+        <p class="principle">고를 것을 줄인다.</p>
+        <p class="tools">선택지형 질의 · 열람용 명세 · 긴급 우선 표시</p>
+      </div>
+      <div class="answer">
+        <span class="num">03</span>
+        <h3>검증된 것만 도입</h3>
+        <p class="principle">실험은 개인 시간에.</p>
+        <p class="tools">모델 전환·데몬 분리 등 미검증 방식 미적용</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 경과 ============ -->
+<section class="block" id="flow">
+  <div class="wrap">
+    <div class="slide-head"><span class="num">03</span><h2>경과</h2><span class="sub">2026.07 — 10</span></div>
+    <div class="slide-rule"></div>
+
+    <div class="timeline">
+      <div class="rail">
+        <div class="dot"></div><div class="line"></div>
+        <div class="dot"></div><div class="line"></div>
+        <div class="dot"></div><div class="line"></div>
+        <div class="dot now"></div><div class="line"></div>
+        <div class="dot"></div>
+      </div>
+      <div class="tl-cards">
+        <div class="tl-card">
+          <span class="period">07</span>
+          <h3>투입</h3>
+          <p>설계 문서 신뢰도 낮음 · 레거시 혼재</p>
+        </div>
+        <div class="tl-card">
+          <span class="period">08</span>
+          <h3>AI 구현 착수</h3>
+          <p>시나리오 검증 불가 확인 · 세션 간 수동 전달 · 배포 도구 보급 · 규칙 단계화</p>
+          <figure class="evidence">
+            <a href="assets/session-relay.jpeg" target="_blank" rel="noopener"><img src="assets/session-relay.jpeg" alt="세션 간 요청과 답변을 사람이 복사해 전달하던 초기 운영 화면"></a>
+            <figcaption>초기 운영: 세션 간 요청·답변 수동 전달</figcaption>
+          </figure>
+        </div>
+        <div class="tl-card">
+          <span class="period">09</span>
+          <h3>방식 정착</h3>
+          <p>청사진·완료 보고 정착 · 터미널 중심 전환</p>
+        </div>
+        <div class="tl-card now">
+          <span class="period">10</span>
+          <h3>하네스 완성 · 구현 완료</h3>
+          <p>세션 병렬 운영 · 규칙 9차 정비 · 검증 파이프라인 · 11월분 구현 완료</p>
+        </div>
+        <div class="tl-card">
+          <span class="period">10.30</span>
+          <h3>철수 · 인계</h3>
+          <p>통합 문서 · 데이터셋 SQL · 검증용 계정</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 하네스 ============ -->
+<section class="block" id="harness">
+  <div class="wrap">
+    <div class="slide-head"><span class="num">04</span><h2>하네스</h2><span class="sub">Rules · Skills · Scripts</span></div>
+    <div class="slide-rule"></div>
+
+    <div class="layers">
+      <div class="layer"><span class="lname">Rules</span><h3>규칙</h3><p>판단 기준 · 문서 13개</p></div>
+      <div class="arrow">→</div>
+      <div class="layer"><span class="lname">Skills</span><h3>스킬</h3><p>절차 · 정본만 지정</p></div>
+      <div class="arrow">→</div>
+      <div class="layer"><span class="lname">Scripts</span><h3>스크립트</h3><p>반복 작업 자동화</p></div>
+    </div>
+
+    <p class="section-label">Human Gate</p>
+    <div class="gate">
+      <span class="step">청사진</span><span class="sep">→</span>
+      <span class="step human">사람 승인</span><span class="sep">→</span>
+      <span class="step">구현</span><span class="sep">→</span>
+      <span class="step">검증</span><span class="sep">→</span>
+      <span class="step">완료 보고</span>
+    </div>
+
+    <p class="section-label">Role Sessions</p>
+    <div class="roles">
+      <div class="role"><span class="rname">qa-master</span><p>결정권</p></div>
+      <div class="role"><span class="rname">ai-rule-master</span><p>규칙 수정</p></div>
+      <div class="role"><span class="rname">skill-gen-master</span><p>도구 제작</p></div>
+      <div class="role"><span class="rname">*-developer</span><p>서비스별 구현</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 사례 ============ -->
+<section class="block" id="cases">
+  <div class="wrap">
+    <div class="slide-head"><span class="num">05</span><h2>사례</h2><span class="sub">Context · Approach · Outcome</span></div>
+    <div class="slide-rule"></div>
+
+    <article class="case">
+      <div class="case-head"><span class="badge ink">CASE 01</span><span class="badge outline">TEST</span></div>
+      <h3 class="case-title">시나리오 검증 자동화</h3>
+      <div class="case-body">
+        <div class="case-visual">
+          <span class="vlabel">Triage</span>
+          <ol>
+            <li><b>A</b>일치 → 수행</li>
+            <li><b>B</b>불일치 → 정정 후 수행</li>
+            <li><b>C</b>미구현 → 제외</li>
+            <li><b>D</b>소관 외 → 제외</li>
+            <li><b>E</b>데이터 필요 → 데이터셋·Stub</li>
+          </ol>
+        </div>
+        <div class="case-text">
+          <div class="blk"><span class="blabel">Context</span><p>원본 그대로 검증 불가 · 직접 고친 4화면 83건도 코드 대조 후 11건 제외, 9건 신규 · 화면당 체감 약 1시간 · E2E 수준</p></div>
+          <div class="blk"><span class="blabel">Approach</span><p>코드 기준 대조 · A~E 분류 · 이전 결과 승계 · 데이터셋·Stub 구성</p></div>
+          <div class="blk"><span class="blabel">Outcome</span><p>파이프라인 구축 · 야간 일괄 검증 · 26/34화면</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="case">
+      <div class="case-head"><span class="badge ink">CASE 02</span><span class="badge outline">INCIDENT</span></div>
+      <h3 class="case-title">세션 정체 재발 방지</h3>
+      <div class="case-body">
+        <div class="case-visual">
+          <span class="vlabel">Stalled</span>
+          <div class="big">7h 37m</div>
+          <ol>
+            <li><b>예방</b>지시 3줄 의무화</li>
+            <li><b>차단</b>질의 창 비활성화</li>
+            <li><b>감지</b>무활동 시간 탐지</li>
+          </ol>
+        </div>
+        <div class="case-text">
+          <div class="blk"><span class="blabel">Context</span><p>질의 대기로 정체 · 상태 값 정상 표시 · 경보 미발생</p></div>
+          <div class="blk"><span class="blabel">Approach</span><p>원인별 3단계 대응</p></div>
+          <div class="blk"><span class="blabel">Outcome</span><p>재발 방지 · 기존 경고 결함 발견·수정</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="case">
+      <div class="case-head"><span class="badge ink">CASE 03</span><span class="badge outline">BOTTLENECK</span></div>
+      <h3 class="case-title">결정 세션 병목 해소</h3>
+      <div class="case-body">
+        <div class="case-visual">
+          <span class="vlabel">Patrol</span>
+          <div class="big">254 <small>runs / ~40h</small></div>
+          <span class="vnote">10분 주기 · 긴급 우선</span>
+        </div>
+        <div class="case-text">
+          <div class="blk"><span class="blabel">Context</span><p>결정 세션에 판단·점검·집계·도구 제작 집중</p></div>
+          <div class="blk"><span class="blabel">Approach</span><p>기계적 업무 자동화 · 도구 제작 전담 세션 분리</p></div>
+          <div class="blk"><span class="blabel">Outcome</span><p>긴급 항목만 확인 · 중복 26% 정리</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="case">
+      <div class="case-head"><span class="badge ink">CASE 04</span><span class="badge outline">BOUNDARY</span></div>
+      <h3 class="case-title">명세 우선 조회</h3>
+      <div class="case-body">
+        <div class="case-visual">
+          <span class="vlabel">Spec First</span>
+          <ol>
+            <li><b>1</b>명세 조회</li>
+            <li><b>2</b>미해결 시 담당 세션</li>
+          </ol>
+          <span class="vnote">생성기 5종 → 1종 통합</span>
+        </div>
+        <div class="case-text">
+          <div class="blk"><span class="blabel">Context</span><p>타 담당 소스 직접 열람 시도 · 문의 시 작업 중단</p></div>
+          <div class="blk"><span class="blabel">Approach</span><p>API 명세 자동 생성 · 조회 순서 규정</p></div>
+          <div class="blk"><span class="blabel">Outcome</span><p>문의 축소 · Swagger 대체</p></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="case">
+      <div class="case-head"><span class="badge ink">CASE 05</span><span class="badge outline">DOMAIN</span></div>
+      <h3 class="case-title">비공지 변경 탐지 · 인계 통합</h3>
+      <div class="case-body">
+        <div class="case-visual">
+          <span class="vlabel">Consolidated</span>
+          <div class="big">30 + 22</div>
+          <span class="vnote">화면 · 정책 문서</span>
+        </div>
+        <div class="case-text">
+          <div class="blk"><span class="blabel">Context</span><p>공통코드 비공지 변경 · 라벨 미표시 결함 반복</p></div>
+          <div class="blk"><span class="blabel">Approach</span><p>스냅샷 차이 자동 요약 · 화면·정책 단위 통합</p></div>
+          <div class="blk"><span class="blabel">Outcome</span><p>변경 조기 인지 · 통합 문서 52편</p></div>
+        </div>
+      </div>
+    </article>
+
+    <div class="more">
+      <p class="section-label">More</p>
+      <ul>
+        <li>응답 대기 단계적 알림</li>
+        <li>일회성 예외의 규칙화 여부</li>
+        <li>규칙 사본 제거</li>
+        <li>외부 강제 요건과의 분리</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 팀 도구 ============ -->
+<section class="block" id="tool">
+  <div class="wrap">
+    <div class="slide-head"><span class="num">06</span><h2>팀 도구</h2><span class="sub">git-deploy-extractor</span></div>
+    <div class="slide-rule"></div>
+    <div class="case-body">
+      <div class="case-visual">
+        <span class="vlabel">Deploy Package</span>
+        <div class="big">v0.9.1</div>
+        <span class="vnote">팀 사용 중</span>
+      </div>
+      <div class="case-text">
+        <div class="blk"><span class="blabel">Context</span><p>기존 앱: 복수 커밋 중 마지막 1건만 추출</p></div>
+        <div class="blk"><span class="blabel">Outcome</span><p>복수 커밋 합산 · 누락 구현체 탐지 · 테스트·CI·릴리스</p>
+          <div class="chips">
+            <span class="chip">Electron</span><span class="chip">React</span><span class="chip">TypeScript</span><span class="chip">Vitest</span><span class="chip">Playwright</span><span class="chip">GitHub Actions</span>
+          </div>
+          <p style="margin-top:12px"><a href="https://github.com/neisii/git-deploy-extractor" target="_blank">github.com/neisii/git-deploy-extractor</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 효과·한계 ============ -->
+<section class="block" id="tradeoffs">
+  <div class="wrap">
+    <div class="slide-head"><span class="num">07</span><h2>효과 · 한계</h2><span class="sub">Trade-offs</span></div>
+    <div class="slide-rule"></div>
+    <div class="two-col">
+      <div>
+        <h3>효과</h3>
+        <ul>
+          <li>구현 일정 1개월 단축</li>
+          <li>업무 시간 외 검증</li>
+          <li>판단 업무 집중</li>
+          <li>부정확한 입력 사전 차단</li>
+          <li>커밋 사고 자체 복구</li>
+          <li>인계 문서·팀 도구 확보</li>
+        </ul>
+      </div>
+      <div>
+        <h3>한계 · 대응</h3>
+        <ul>
+          <li>인지 부담 증가 <span class="arrow">→</span> 자동화·알림</li>
+          <li>입력 품질 의존 <span class="arrow">→</span> 사전 대조</li>
+          <li>규칙의 한계 <span class="arrow">→</span> 계층 분리</li>
+          <li>정체 판별 곤란 <span class="arrow">→</span> 3단계 대응</li>
+          <li>기준값 중복 <span class="arrow">→</span> 단일 출처화</li>
+          <li>토큰·모델 제약 <span class="arrow">→</span> 모델 고정</li>
+          <li>외부 강제 요건 <span class="arrow">→</span> 브랜치 분리</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 08 공개 자료 ============ -->
+<section class="block" id="published">
+  <div class="wrap">
+    <div class="slide-head"><span class="num">08</span><h2>공개 자료</h2><span class="sub">Published</span></div>
+    <div class="slide-rule"></div>
+    <div class="links">
+      <a class="link-card" href="https://neisii.github.io/git-workflow-troubleshooting-notes/intro.html" target="_blank">
+        <div class="t">Git 문제 해결 노트</div>
+        <div class="d">워크트리 도입 과정 정리</div>
+        <div class="u">neisii.github.io/git-workflow-troubleshooting-notes</div>
+      </a>
+      <a class="link-card" href="https://github.com/neisii/server-status-board" target="_blank">
+        <div class="t">server-status-board</div>
+        <div class="d">서버 상태 터미널 보드</div>
+        <div class="u">github.com/neisii/server-status-board</div>
+      </a>
+      <a class="link-card" href="https://github.com/neisii/claude-status-board" target="_blank">
+        <div class="t">claude-status-board</div>
+        <div class="d">세션 현황 터미널 보드</div>
+        <div class="u">github.com/neisii/claude-status-board</div>
+      </a>
+      <a class="link-card" href="https://neisii.github.io/marknaroo-app/" target="_blank">
+        <div class="t">marknaroo</div>
+        <div class="d">경량 마크다운 뷰어</div>
+        <div class="u">neisii.github.io/marknaroo-app</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">Baek Ga Hui · Backend Engineer · github.com/neisii</div>
+</footer>
+
+</body>
+</html>
