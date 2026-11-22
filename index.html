@@ -215,6 +215,28 @@ figure.evidence figcaption { font-family: var(--mono); font-size: 11px; color: v
 .link-card .t { font-family: var(--serif); font-size: 17px; font-weight: 500; }
 .link-card .d { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
 .link-card .u { font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 6px; }
+.link-card.wide { grid-column: 1 / -1; }
+/* 점을 카드마다 붙인다(카드 높이가 달라도 점이 카드 옆에 온다). 왼쪽 레일은 칸 너비만 차지 */
+.timeline { --tl-gap: 22px; }
+.timeline .rail { visibility: hidden; }
+.tl-card { position: relative; }
+.tl-card::before {
+  content: ""; position: absolute; left: calc(-1 * var(--tl-gap) - 18px); top: 22px; z-index: 1;
+  width: 12px; height: 12px; border-radius: 50%; box-sizing: border-box;
+  background: var(--ink-2); border: 2px solid var(--bg); box-shadow: 0 0 0 1.5px var(--ink-2);
+}
+.tl-card.now::before { background: var(--accent); box-shadow: 0 0 0 1.5px var(--accent); }
+.tl-card.after::before { background: var(--bg); box-shadow: 0 0 0 1.5px var(--ink-3); }
+.tl-card::after {
+  content: ""; position: absolute; left: calc(-1 * var(--tl-gap) - 12.75px); top: 38px;
+  width: 1.5px; height: calc(100% - 6px); background: var(--line);
+}
+.tl-card:last-child::after { display: none; }
+.tl-card.after { border-style: dashed; background: transparent; }
+.tl-card.after h3, .tl-card.after p { color: var(--ink-2); }
+.open-note { margin: 22px 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+.open-note b { font-family: var(--serif); font-weight: 500; color: var(--ink); }
+.open-note a { color: var(--accent); }
 
 footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font-family: var(--mono); font-size: 12px; color: var(--ink-3); text-align: center; letter-spacing: 0.5px; }
 
@@ -226,7 +248,7 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font-family: v
   .cap-card.lead-card { grid-column: auto; }
   .case-body { grid-template-columns: minmax(0, 1fr); }
   .hero-contact { flex-direction: column; gap: 6px; }
-  .timeline { gap: 0 12px; }
+  .timeline { gap: 0 12px; --tl-gap: 12px; }
   .layers { grid-template-columns: minmax(0, 1fr); }
   .layers .arrow { justify-content: center; transform: rotate(90deg); }
   .slide-head .sub { margin-left: 0; width: 100%; }
@@ -369,7 +391,8 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font-family: v
         <div class="dot"></div><div class="line"></div>
         <div class="dot"></div><div class="line"></div>
         <div class="dot now"></div><div class="line"></div>
-        <div class="dot"></div>
+        <div class="dot"></div><div class="line"></div>
+        <div class="dot after"></div>
       </div>
       <div class="tl-cards">
         <div class="tl-card">
@@ -400,6 +423,11 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font-family: v
           <span class="period">10.30</span>
           <h3>철수 · 인계</h3>
           <p>통합 문서 · 데이터셋 SQL · 검증용 계정</p>
+        </div>
+        <div class="tl-card after">
+          <span class="period">이후 · 11</span>
+          <h3>일반화 공개</h3>
+          <p>공개판 harness-naroo 공개 · 별도 시험으로 확인</p>
         </div>
       </div>
     </div>
@@ -436,6 +464,7 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font-family: v
       <div class="role"><span class="rname">skill-gen-master</span><p>도구 제작</p></div>
       <div class="role"><span class="rname">*-developer</span><p>서비스별 구현</p></div>
     </div>
+    <p class="open-note"><b>공개판 harness-naroo</b> — 이 체계에서 사업에 묶이지 않은 핵심을 익명화해 추린 Claude Code 플러그인 · 2026.11 공개 · Apache-2.0 · <a href="https://github.com/neisii/harness-naroo" target="_blank" rel="noopener">github.com/neisii/harness-naroo</a></p>
   </div>
 </section>
 
@@ -617,6 +646,11 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font-family: v
     <div class="slide-head"><span class="num">08</span><h2>공개 자료</h2><span class="sub">Published</span></div>
     <div class="slide-rule"></div>
     <div class="links">
+      <a class="link-card wide" href="https://github.com/neisii/harness-naroo" target="_blank">
+        <div class="t">harness-naroo</div>
+        <div class="d">AI-DLC 체계의 공개판</div>
+        <div class="u">github.com/neisii/harness-naroo</div>
+      </a>
       <a class="link-card" href="https://neisii.github.io/git-workflow-troubleshooting-notes/intro.html" target="_blank">
         <div class="t">Git 문제 해결 노트</div>
         <div class="d">워크트리 도입 과정 정리</div>
@@ -634,7 +668,7 @@ footer { border-top: 1px solid var(--line); padding: 28px 0 48px; font-family: v
       </a>
       <a class="link-card" href="https://neisii.github.io/marknaroo-app/" target="_blank">
         <div class="t">marknaroo</div>
-        <div class="d">경량 마크다운 뷰어</div>
+        <div class="d">마크다운 뷰어 · Chrome 웹스토어·PWA</div>
         <div class="u">neisii.github.io/marknaroo-app</div>
       </a>
     </div>

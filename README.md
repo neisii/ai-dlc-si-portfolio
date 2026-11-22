@@ -4,4 +4,6 @@
 
 **페이지:** https://neisii.github.io/ai-dlc-si-portfolio/
 
+이 체계에서 사업에 묶이지 않은 핵심을 익명화해 추린 공개판은 [harness-naroo](https://github.com/neisii/harness-naroo)입니다.
+
 이 저장소에는 배포 산출물만 있고, 소스는 비공개입니다.
